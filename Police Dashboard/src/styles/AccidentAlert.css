@@ -1,0 +1,14 @@
+.accident-alert {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.video-feed {
+  max-width: 100%;
+  width: 800px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}

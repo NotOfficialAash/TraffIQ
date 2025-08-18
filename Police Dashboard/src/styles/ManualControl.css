@@ -1,0 +1,66 @@
+.control-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.control-title {
+    font-size: 3.5vw;
+    text-align: center;
+    margin-top: 0;
+    padding-top: 0.5vw;
+    margin-bottom: 1rem;
+}
+
+.map-container {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.signal-controls {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.signals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.signal-control {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.signal-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.signal-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.signal-btn.active {
+  transform: scale(0.95);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.signal-btn:nth-child(1) { background: #ff4444; }
+.signal-btn:nth-child(2) { background: #ffbb33; }
+.signal-btn:nth-child(3) { background: #00C851; }
+
+.signal-btn:hover {
+  filter: brightness(1.1);
+}
