@@ -86,7 +86,7 @@ function ManualControl() {
       <div className="control-layout">
         {/* Map View */}
         <div className="map-container">
-          <MapContainer center={[12.9716, 77.5946]} zoom={13} style={{ height: '40vw', width: '47vw' }}>
+          <MapContainer center={[12.9716, 77.5946]} zoom={13} style={{ height: '39vw', width: '47vw' }}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
             {intersections.map(intersection => (
               <Marker key={intersection.id} position={intersection.position} eventHandlers={{click: () => handleIntersectionSelect(intersection),}}>

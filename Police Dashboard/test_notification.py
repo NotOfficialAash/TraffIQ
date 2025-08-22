@@ -14,6 +14,8 @@ last_notification_time = 0
 async def process_video_stream(websocket):
     global last_notification_time
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     
     if not cap.isOpened():
         print("Error: Could not open camera")
