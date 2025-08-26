@@ -1,97 +1,117 @@
-import cv2
 import threading
-import time
-import firebase_admin
-from firebase_admin import firestore, credentials
-import datetime
 import logging as log
+
+import cv2
 from ultralytics import YOLO
 
-import random
-
-# Firebase setup
-credentials = credentials.Certificate("firebase-key.json")
-firebase_admin.initialize_app(credentials)
-db = firestore.client()
+import database
+import traffic
+import accident
 
 
-# Shared Data + Thread Lock
-shared_data = {}
+camera_source = 0
 lock = threading.Lock()
+model = YOLO(model="custom_yolo.pt", verbose=False)
 
-
-# Global Variables
-cam_src = 1
-model = YOLO("custom_yolo.pt")
 log.basicConfig(
-    level=log.INFO,  # set minimum log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    level=log.INFO,
     format="%(asctime)s // [%(levelname)s] %(message)s"
 )
 
+regions = {
+    "region1": (0, 0, 426, 720),
+    "region2": (427, 0, 853, 720),
+    "region3": (854, 0, 1280, 720)
+}
 
-def yolo_process():
-    capture = cv2.VideoCapture(cam_src)
+shared_data = {
+    "vehicle": {"region1": 0, "region2": 0, "region3": 0},
+    "accident": {"accident": False, "accidentCount": 0}
+}
+
+
+def get_region(cx, cy):
+    for name, (rx1, ry1, rx2, ry2) in regions.items():
+        if rx1 <= cx <= rx2 and ry1 <= cy <= ry2:
+            return name
+    return None
+
+
+def main():
+    log.info("Initializing and Starting Threads...")
+    trf_thread = threading.Thread(target=..., daemon=True)
+    acc_thread = threading.Thread(target=..., daemon=True)
+    dbs_thread = threading.Thread(target=..., daemon=True)
+    trf_thread.start()
+    acc_thread.start()
+    dbs_thread.start()
+    log.info("Threads Started")
+
+    capture = cv2.VideoCapture(camera_source)
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
     if not capture.isOpened():
-        log.error("Unable to Open Capture Source")
+        log.critical("Unable to Open Capture Source")
         return
-    
-    log.info("Capture Source Opened")
+
+    log.info("Capture Source Open")
+    names = model.names
 
     try:
+        frame_id = 0
         while capture.isOpened():
-            success, frames = capture.read()
+            success, frame = capture.read()
             if not success:
-                log.error("Video Stream Not Found")
-                return
-
-            results = model(frames)[0]
-
-            annotated = results.plot()
-            cv2.imshow("Live", annotated)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+                log.error("Failed to read frame")
                 break
 
-    except Exception as e:  
-        log.critical(e)
+            frame_id += 1
+            if frame_id % 2 != 0:
+                capture.grab()
+                continue
 
+            results = model.predict(frame, verbose=False)
+            result = results[0]
 
-def traffic_process():
-    while True:
-        time.sleep(2)
-        with lock:
-            data = shared_data.copy()
-        # print("[Traffic] Read vehicles:", data.get("vehicles"))
+            accident_count = 0
+            region_counts = dict.fromkeys(regions.keys(), 0)
 
+            for box, classid in zip(result.boxes.xyxy.cpu().numpy(), result.boxes.cls.cpu().numpy()):
+                x1, y1, x2, y2 = box.astype(int)
+                label = names[int(classid)]
 
-def accident_process():
-    while True:
-        time.sleep(3)
-        with lock:
-            data = shared_data.copy()
-        
-        # if data.get("accident"):
-        #     print("accident detected")
-        # else:
-        #     print("No accident")
+                if label == "accident":
+                    accident_count += 1
+
+                elif label == "objects":
+                    cx = (x1 + x2) // 2
+                    cy = (y1 + y2) // 2
+                    region = get_region(cx, cy)
+                    if region:
+                        region_counts[region] += 1
+
+            with lock:
+                shared_data["vehicle"] = region_counts.copy()
+                shared_data["accident"]["accident"] = accident_count > 0
+                shared_data["accident"]["accidentCount"] = accident_count
+
+    except Exception:
+        log.exception("Unexpected exception occurred")
+
+    finally:
+        capture.release()
+        cv2.destroyAllWindows()
+        log.info("Capture Released and Resources Cleaned")
+
 
 
 if __name__ == "__main__":
     try:
-        cam_thread = threading.Thread(target=yolo_process, daemon=True)
-        trf_thread = threading.Thread(target=traffic_process, daemon=True)
-        acc_thread = threading.Thread(target=accident_process, daemon=True)
-
-        cam_thread.start()
-        trf_thread.start()
-        acc_thread.start()
-
-        log.info("System running. Press Ctrl+C to stop.")
-
-        while True:
-            time.sleep(0.1)
-
+        log.info("System Starting...  Press Ctrl+C to stop anytime.")
+        log.info("Imports Initialized")
+        main()
     except KeyboardInterrupt:
-        log.info("Shutting down cleanly...")
+        log.info("Safely Shutting Down...")
+    except Exception:
+        log.exception("Unexpected exception occurred")
