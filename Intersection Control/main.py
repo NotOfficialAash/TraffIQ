@@ -1,12 +1,13 @@
+import json
+import numpy
 import threading
 import logging as log
-import json
 
 import cv2
 from ultralytics import YOLO
 
-import database
 import traffic
+import database
 import accident
 
 
@@ -33,6 +34,30 @@ def get_region(cx, cy):
         if rx1 <= cx <= rx2 and ry1 <= cy <= ry2:
             return name
     return None
+
+def create_region_overlay(frame_shape, regions):
+    """
+    Creates a transparent overlay with region rectangles and names.
+    This avoids redrawing regions every frame.
+    """
+    overlay = cv2.imread("blank.png") if False else None  # placeholder, not needed
+    overlay = 255 * numpy.ones((*frame_shape[:2], 3), dtype=numpy.uint8)  # same size as frame
+    overlay[:] = 0  # make it black/transparent
+
+    for name, (rx1, ry1, rx2, ry2) in regions.items():
+        # Draw rectangle
+        cv2.rectangle(overlay, (rx1, ry1), (rx2, ry2), (0, 255, 0), 2)
+        # Draw label
+        cv2.putText(
+            overlay, name, (rx1, ry1 - 5),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2
+        )
+    return overlay
+
+
+def blend_overlay(frame, overlay, alpha=0.5):
+    """Blend overlay onto frame with given transparency."""
+    return cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
 
 
 def main():
@@ -66,15 +91,18 @@ def main():
                 log.error("Failed to read frame")
                 break
 
+            region_overlay = create_region_overlay(frame.shape, regions)
+
             frame_id += 1
-            process_every = 2
-            if frame_id % process_every != 0:
+            skip_frames = 2
+            if frame_id % skip_frames != 0:
                 capture.grab()
                 continue
 
             try:
                 results = model.predict(frame, verbose=False, device=model_device, half=model_half)
-            except:
+
+            except Exception:
                 log.exception("Model Inference Failed, Skipping Frame")
                 continue
 
@@ -103,8 +131,15 @@ def main():
                 shared_data["accident"]["accidentCount"] = accident_count
 
                 if shared_data != prev_data:
-                    log.info(shared_data)
+                    log.info(f"Vehicles: {shared_data['vehicle']} | Accident: {shared_data['accident']}")
                     prev_data = shared_data.copy()
+            
+            annotated = results.plot()
+            annotated = blend_overlay(annotated, region_overlay, alpha=0.5)
+            
+            cv2.imshow("Live", annotated)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                return
 
     except Exception:
         log.exception("Unexpected exception occurred")

@@ -1,10 +1,4 @@
 def yolo_process():
-            with lock:
-                shared_data["accidents"] = accident_count
-                shared_data["regions"] = region_counts
-
-            log.info(f"Accidents: {accident_count}, Region Counts: {region_counts}")
-
             # Draw regions
             for (rx1, ry1, rx2, ry2) in regions.values():
                 cv2.rectangle(frames, (rx1, ry1), (rx2, ry2), (0, 255, 0), 2)
