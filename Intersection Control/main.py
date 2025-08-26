@@ -1,5 +1,6 @@
 import threading
 import logging as log
+import json
 
 import cv2
 from ultralytics import YOLO
@@ -12,20 +13,17 @@ import accident
 camera_source = 0
 lock = threading.Lock()
 model = YOLO(model="custom_yolo.pt", verbose=False)
+model_device = 'cpu'
+model_half = False
+regions = json.load(open("regions.json"))
 
 log.basicConfig(
     level=log.INFO,
-    format="%(asctime)s // [%(levelname)s] %(message)s"
+    format="%(asctime)s // [MAIN::%(levelname)s] %(message)s"
 )
 
-regions = {
-    "region1": (0, 0, 426, 720),
-    "region2": (427, 0, 853, 720),
-    "region3": (854, 0, 1280, 720)
-}
-
 shared_data = {
-    "vehicle": {"region1": 0, "region2": 0, "region3": 0},
+    "vehicle": {region : 0 for region in regions.keys()},
     "accident": {"accident": False, "accidentCount": 0}
 }
 
@@ -60,6 +58,8 @@ def main():
 
     try:
         frame_id = 0
+        prev_data = None
+
         while capture.isOpened():
             success, frame = capture.read()
             if not success:
@@ -67,11 +67,17 @@ def main():
                 break
 
             frame_id += 1
-            if frame_id % 2 != 0:
+            process_every = 2
+            if frame_id % process_every != 0:
                 capture.grab()
                 continue
 
-            results = model.predict(frame, verbose=False)
+            try:
+                results = model.predict(frame, verbose=False, device=model_device, half=model_half)
+            except:
+                log.exception("Model Inference Failed, Skipping Frame")
+                continue
+
             result = results[0]
 
             accident_count = 0
@@ -95,6 +101,10 @@ def main():
                 shared_data["vehicle"] = region_counts.copy()
                 shared_data["accident"]["accident"] = accident_count > 0
                 shared_data["accident"]["accidentCount"] = accident_count
+
+                if shared_data != prev_data:
+                    log.info(shared_data)
+                    prev_data = shared_data.copy()
 
     except Exception:
         log.exception("Unexpected exception occurred")
