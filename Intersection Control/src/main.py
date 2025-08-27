@@ -36,18 +36,11 @@ lock = threading.Lock()
 model = YOLO(model="../custom_yolo.pt", verbose=False)
 model_device = 'cpu'
 model_half = False
-regions = json.load(open("../regions.json"))
 
 log.basicConfig(
     level=log.INFO,
     format="%(asctime)s // [%(levelname)s] %(message)s"
 )
-
-shared_data = {
-    "vehicle": {region : 0 for region in regions.keys()},
-    "total" : 0,
-    "accident": {"accident": False, "accident_count": 0, "ai_confidence" : 0}
-}
 
 
 def capture_init():
@@ -178,9 +171,19 @@ def main():
 if __name__ == "__main__":
     try:
         log.info("Systems  Starting...")
+
         capture_init()
         traffic.init()
         database.init()
+
+        regions = database.get_intersection_data()
+
+        shared_data = {
+            "vehicle": {region : 0 for region in regions.keys()},
+            "total" : 0,
+            "accident": {"accident": False, "accident_count": 0, "ai_confidence" : 0}
+        }
+        
         log.info("Systems Initialized")
         main()
 

@@ -27,12 +27,7 @@ tick = 0.1
 arduino = None
 log_interval = 1800
 lat, lng = 12.312735, 76.583278
-regions = load(open("../regions.json"))
-region_names = list(regions.keys())
-signal_order = {
-    region_names[i]: region_names[(i + 1) % len(region_names)]
-    for i in range(len(region_names))
-}
+
 
 PHASE_FLOW = {
     "green": "yellow_stop",
@@ -79,6 +74,13 @@ def get_durations(vehicle_counts):
 
 
 def run(shared_data : dict, lock):
+    regions = database.get_intersection_data()
+    region_names = list(regions.keys())
+    signal_order = {
+        region_names[i]: region_names[(i + 1) % len(region_names)]
+        for i in range(len(region_names))
+    }
+
     current_green = region_names[0]
     next_green = signal_order[current_green]
     current_phase = "green"
