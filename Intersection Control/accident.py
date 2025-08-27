@@ -11,7 +11,7 @@ Description:
 ================================================================================
 """
 
-# TODO: Implement algorithm to find nearest hospital
+# TODO: Implement algorithm to find nearest hospital and find severity
 # TODO: Log nearest hospital along with accident info
 
 import time

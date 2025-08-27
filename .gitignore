@@ -1,2 +1,27 @@
+# Intersection Control rules
 Intersection Control/firebase-key.json
 Intersection Control/__pycache__
+
+# Police Dashboard rules
+Police Dashboard/logs/
+Police Dashboard/*.log
+Police Dashboard/npm-debug.log*
+Police Dashboard/yarn-debug.log*
+Police Dashboard/yarn-error.log*
+Police Dashboard/pnpm-debug.log*
+Police Dashboard/lerna-debug.log*
+
+Police Dashboard/node_modules/
+Police Dashboard/dist/
+Police Dashboard/dist-ssr/
+Police Dashboard/*.local
+
+Police Dashboard/.vscode/*
+!Police Dashboard/.vscode/extensions.json
+Police Dashboard/.idea/
+Police Dashboard/.DS_Store
+Police Dashboard/*.suo
+Police Dashboard/*.ntvs*
+Police Dashboard/*.njsproj
+Police Dashboard/*.sln
+Police Dashboard/*.sw?
