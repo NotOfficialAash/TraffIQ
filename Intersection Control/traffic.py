@@ -55,7 +55,7 @@ def set_signal_state(signal: str, red: bool, yellow: bool, green: bool):
 def close_arduino():
     send_signal("EXIT")
     arduino.close()
-    log.info("Arduino connection closed.")
+    log.info("Arduino Connection Closed.")
 
 
 def get_durations(vehicle_counts):
@@ -121,5 +121,7 @@ def run(shared_data : dict, lock):
                 "density" : data["total"]
                 }
 
-            document_id = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+            document_id = datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
             database.write_data(collection="traffic_data", data=data_pack, document_id=document_id)
+            last_log_time = current_time
+            log.info("Auto-Logged Traffic Density Data")

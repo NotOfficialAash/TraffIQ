@@ -164,6 +164,9 @@ if __name__ == "__main__":
         log.info("Systems Initialized")
         main()
 
+    except KeyboardInterrupt:
+        log.critical("User Commanded Immediate Shut Down")
+        
     except Exception:
         log.exception("Unexpected exception occurred")
 
