@@ -2,16 +2,19 @@ import json
 import numpy
 import threading
 import logging as log
+from sys import exit
 
 import cv2
 from ultralytics import YOLO
 
 import traffic
-import database
 import accident
+import database
 
 
-camera_source = 0
+capture_source = 0
+frame_width = 1280
+frame_height = 720
 lock = threading.Lock()
 model = YOLO(model="custom_yolo.pt", verbose=False)
 model_device = 'cpu'
@@ -20,13 +23,23 @@ regions = json.load(open("regions.json"))
 
 log.basicConfig(
     level=log.INFO,
-    format="%(asctime)s // [MAIN::%(levelname)s] %(message)s"
+    format="%(asctime)s // [%(levelname)s] %(message)s"
 )
 
 shared_data = {
     "vehicle": {region : 0 for region in regions.keys()},
-    "accident": {"accident": False, "accidentCount": 0}
+    "total" : 0,
+    "accident": {"accident": False, "accident_count": 0}
 }
+
+
+def capture_init():
+    capture = cv2.VideoCapture(capture_source)
+    if not capture.isOpened():
+        log.critical("Unable to Open Capture Source")
+        exit(1)
+    
+    capture.release()
 
 
 def get_region(cx, cy):
@@ -35,14 +48,9 @@ def get_region(cx, cy):
             return name
     return None
 
+
 def create_region_overlay(frame_shape, regions):
-    """
-    Creates a transparent overlay with region rectangles and names.
-    This avoids redrawing regions every frame.
-    """
-    overlay = cv2.imread("blank.png") if False else None  # placeholder, not needed
-    overlay = 255 * numpy.ones((*frame_shape[:2], 3), dtype=numpy.uint8)  # same size as frame
-    overlay[:] = 0  # make it black/transparent
+    overlay = numpy.zeros((*frame_shape[:2], 3), dtype=numpy.uint8)  # fully transparent
 
     for name, (rx1, ry1, rx2, ry2) in regions.items():
         # Draw rectangle
@@ -56,30 +64,27 @@ def create_region_overlay(frame_shape, regions):
 
 
 def blend_overlay(frame, overlay, alpha=0.5):
-    """Blend overlay onto frame with given transparency."""
-    return cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
+    return cv2.addWeighted(frame, 1, overlay, alpha, 0)
 
 
 def main():
     log.info("Initializing and Starting Threads...")
-    trf_thread = threading.Thread(target=..., daemon=True)
-    acc_thread = threading.Thread(target=..., daemon=True)
-    dbs_thread = threading.Thread(target=..., daemon=True)
+    trf_thread = threading.Thread(target=traffic.run, args=(shared_data, lock), daemon=True)
+    acc_thread = threading.Thread(target=accident.run, args=(shared_data, lock), daemon=True)
     trf_thread.start()
     acc_thread.start()
-    dbs_thread.start()
     log.info("Threads Started")
 
-    capture = cv2.VideoCapture(camera_source)
-    capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-
-    if not capture.isOpened():
-        log.critical("Unable to Open Capture Source")
-        return
+    capture = cv2.VideoCapture(capture_source)
+    capture.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
+    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
 
     log.info("Capture Source Open")
     names = model.names
+
+    dummy_frame = numpy.zeros((frame_height, frame_width, 3), dtype=numpy.uint8)
+    region_overlay = create_region_overlay(dummy_frame.shape, regions)
+
 
     try:
         frame_id = 0
@@ -91,12 +96,9 @@ def main():
                 log.error("Failed to read frame")
                 break
 
-            region_overlay = create_region_overlay(frame.shape, regions)
-
             frame_id += 1
             skip_frames = 2
             if frame_id % skip_frames != 0:
-                capture.grab()
                 continue
 
             try:
@@ -109,6 +111,7 @@ def main():
             result = results[0]
 
             accident_count = 0
+            total_vehicle_count = 0
             region_counts = dict.fromkeys(regions.keys(), 0)
 
             for box, classid in zip(result.boxes.xyxy.cpu().numpy(), result.boxes.cls.cpu().numpy()):
@@ -119,6 +122,7 @@ def main():
                     accident_count += 1
 
                 elif label == "objects":
+                    total_vehicle_count += 1
                     cx = (x1 + x2) // 2
                     cy = (y1 + y2) // 2
                     region = get_region(cx, cy)
@@ -127,16 +131,17 @@ def main():
 
             with lock:
                 shared_data["vehicle"] = region_counts.copy()
+                shared_data["total"] = total_vehicle_count
                 shared_data["accident"]["accident"] = accident_count > 0
-                shared_data["accident"]["accidentCount"] = accident_count
+                shared_data["accident"]["accident_count"] = accident_count
 
                 if shared_data != prev_data:
                     log.info(f"Vehicles: {shared_data['vehicle']} | Accident: {shared_data['accident']}")
                     prev_data = shared_data.copy()
             
-            annotated = results.plot()
+            annotated = result.plot()
             annotated = blend_overlay(annotated, region_overlay, alpha=0.5)
-            
+
             cv2.imshow("Live", annotated)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 return
@@ -150,13 +155,18 @@ def main():
         log.info("Capture Released and Resources Cleaned")
 
 
-
 if __name__ == "__main__":
     try:
-        log.info("System Starting...  Press Ctrl+C to stop anytime.")
-        log.info("Imports Initialized")
+        log.info("Systems  Starting...")
+        capture_init()
+        traffic.init()
+        database.init()
+        log.info("Systems Initialized")
         main()
-    except KeyboardInterrupt:
-        log.info("Safely Shutting Down...")
+
     except Exception:
         log.exception("Unexpected exception occurred")
+
+    finally:
+        traffic.close_arduino()
+        log.info("Safely Shutting Down...")
