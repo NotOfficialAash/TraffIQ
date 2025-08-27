@@ -1,3 +1,16 @@
+"""
+================================================================================
+Project: Smart Traffic and Accident Monitoring System
+File: traffic.py
+Author(s): Aashrith Srinivasa.
+License: See LICENSE file in the repository for full terms.
+Description:
+    Handles traffic light control, vehicle counting per region, and
+    logging traffic density data to Firestore at regular intervals.
+================================================================================
+"""
+
+
 import time
 import datetime
 import logging as log
@@ -121,7 +134,7 @@ def run(shared_data : dict, lock):
                 "density" : data["total"]
                 }
 
-            document_id = datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
+            document_id = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%S")
             database.write_data(collection="traffic_data", data=data_pack, document_id=document_id)
             last_log_time = current_time
             log.info("Auto-Logged Traffic Density Data")

@@ -1,3 +1,19 @@
+"""
+================================================================================
+Project: Smart Traffic and Accident Monitoring System
+File: database.py
+Author(s): 
+    - Aashrith Srinivasa.
+    - Atrey K Urs (Databse Initialization).
+License: See LICENSE file in the repository for full terms.
+Description:
+    Provides Firestore initialization and helper functions to write and 
+    update documents in collections. Handles error logging for database
+    operations.
+================================================================================
+"""
+
+
 from sys import exit
 import logging as log
 

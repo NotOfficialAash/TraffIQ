@@ -1,3 +1,20 @@
+"""
+================================================================================
+Project: Smart Traffic and Accident Monitoring System
+File: main.py
+Author(s):
+    - Aashrith Srinivasa.
+    - Punya S (Training YOLO on custom dataset).
+    - Atrey K Urs (Training YOLO on custom dataset).
+License: See LICENSE file in the repository for full terms.
+Description:
+    Entry point for the traffic and accident monitoring system. 
+    Initializes threads, YOLO model, video capture, and coordinates 
+    traffic light control and accident detection.
+================================================================================
+"""
+
+
 import json
 import numpy
 import threading
@@ -29,7 +46,7 @@ log.basicConfig(
 shared_data = {
     "vehicle": {region : 0 for region in regions.keys()},
     "total" : 0,
-    "accident": {"accident": False, "accident_count": 0}
+    "accident": {"accident": False, "accident_count": 0, "ai_confidence" : 0}
 }
 
 
@@ -110,15 +127,17 @@ def main():
 
             result = results[0]
 
+            confidence = 0
             accident_count = 0
             total_vehicle_count = 0
             region_counts = dict.fromkeys(regions.keys(), 0)
 
-            for box, classid in zip(result.boxes.xyxy.cpu().numpy(), result.boxes.cls.cpu().numpy()):
+            for box, classid, conf in zip(result.boxes.xyxy.cpu().numpy(), result.boxes.cls.cpu().numpy(), result.boxes.conf.cpu().numpy()):
                 x1, y1, x2, y2 = box.astype(int)
                 label = names[int(classid)]
 
                 if label == "accident":
+                    confidence = float(conf) * 100
                     accident_count += 1
 
                 elif label == "objects":
@@ -134,6 +153,7 @@ def main():
                 shared_data["total"] = total_vehicle_count
                 shared_data["accident"]["accident"] = accident_count > 0
                 shared_data["accident"]["accident_count"] = accident_count
+                shared_data["accident"]["ai_confidence"] = confidence
 
                 if shared_data != prev_data:
                     log.info(f"Vehicles: {shared_data['vehicle']} | Accident: {shared_data['accident']}")
@@ -166,7 +186,7 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         log.critical("User Commanded Immediate Shut Down")
-        
+
     except Exception:
         log.exception("Unexpected exception occurred")
 
