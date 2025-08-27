@@ -23,7 +23,7 @@ import google.api_core.exceptions
 from firebase_admin import firestore, exceptions as fb_exceptions
 
 
-file_path = "firebase-key.json"
+file_path = "../firebase-key.json"
 
 
 def init():

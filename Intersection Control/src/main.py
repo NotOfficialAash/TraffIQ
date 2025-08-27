@@ -33,10 +33,10 @@ capture_source = 0
 frame_width = 1280
 frame_height = 720
 lock = threading.Lock()
-model = YOLO(model="custom_yolo.pt", verbose=False)
+model = YOLO(model="../custom_yolo.pt", verbose=False)
 model_device = 'cpu'
 model_half = False
-regions = json.load(open("regions.json"))
+regions = json.load(open("../regions.json"))
 
 log.basicConfig(
     level=log.INFO,

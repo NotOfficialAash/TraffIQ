@@ -27,7 +27,7 @@ tick = 0.1
 arduino = None
 log_interval = 1800
 lat, lng = 12.312735, 76.583278
-regions = load(open("regions.json"))
+regions = load(open("../regions.json"))
 region_names = list(regions.keys())
 signal_order = {
     region_names[i]: region_names[(i + 1) % len(region_names)]
