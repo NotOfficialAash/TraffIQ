@@ -8,7 +8,7 @@ function Navbar({ setSelectedView }) {
         <button onClick={() => setSelectedView(null)}>🏠 Home</button>
         <button onClick={() => setSelectedView("manual")}>🕹️ Manual</button>
         <button onClick={() => setSelectedView("stls")}>🚦 STLS</button>
-        <button onClick={() => setSelectedView("sads")}>🚨 SADS</button>
+        <button onClick={() => setSelectedView("sads")}>🚨 Accident History</button>
         <button onClick={() => setSelectedView("alert")}>⚠️ Alerts</button>
       </div>
     </nav>

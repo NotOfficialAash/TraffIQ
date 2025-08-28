@@ -36,7 +36,7 @@
 
 .buttons:hover {
     transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 8px 24px rgba(33, 150, 243, 0.2);
+    box-shadow: 0 8px 24px #2196f333;
     background: #1565c0;
 }
 
