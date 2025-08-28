@@ -25,3 +25,4 @@ Police Dashboard/*.ntvs*
 Police Dashboard/*.njsproj
 Police Dashboard/*.sln
 Police Dashboard/*.sw?
+Police Dashboard/src/components/firebase.js
