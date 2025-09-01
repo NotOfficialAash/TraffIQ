@@ -96,7 +96,7 @@ function AccidentDashboard() {
                         <br />
                         {acc.time?.toDate ? acc.time.toDate().toLocaleString() : "Unknown time"}
                         <br />
-                        <span style={{ fontSize: "0.85rem", color: "#ffffff" }}>
+                        <span className="location-coordinates">
                             Lat: {acc.location?._lat?.toFixed(3)}, Lng:{" "}
                             {acc.location?._long?.toFixed(3)}
                         </span>
@@ -108,13 +108,13 @@ function AccidentDashboard() {
                 <div className="charts-container">
                     <div className="tabs">
                         <button onClick={() => setActiveTab("pie")} className={activeTab === "pie" ? "active" : ""}>
-                            Pie
+                            PIE
                         </button>
                         <button onClick={() => setActiveTab("line")} className={activeTab === "line" ? "active" : ""}>
-                            Line
+                            LINE
                         </button>
                         <button onClick={() => setActiveTab("bar")} className={activeTab === "bar" ? "active" : ""}>
-                            Bar
+                            BAR
                         </button>
                     </div>
 

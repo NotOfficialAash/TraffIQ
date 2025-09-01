@@ -5,11 +5,16 @@ import { db } from "./firebase"; // Firestore instance (adjust path if needed)
 
 import SplashScreen from "./SplashScreen.jsx";
 import AccidentAlert from './AccidentAlert.jsx';
-import ManualControl from './MTIC-System/ManualControl.jsx';
-import STLSMenu from "./STLS-System/STLSMenu.jsx";
+import ManualControl from './ManualControl.jsx';
+import STLSMenu from "./STLSDashboard.jsx";
 import SADSMenu from "./SADSDashboard.jsx";
 import Navbar from "./Navbar.jsx";
 import "../styles/Menu.css";
+
+import controlPanelImg from "../assets/Control Panel.png";
+import trafficHistoryImg from "../assets/Traffic History.png";
+import accidentHistoryImg from "../assets/Accident History.png";
+import welcomeUserImg from "../assets/Welcome Banner.png";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -88,22 +93,16 @@ function App() {
       {/* Main menu */}
       {!showSplash && !selectedView && (
         <div className="parent-body">
-          <h1 className="title">
-            <span className="title-blue">Welcome, </span>
-            <span className="title-white">User</span>
-          </h1>
+          <img className="welcome-img" src={welcomeUserImg} alt=""/>
           <div className="button-container">
             <div>
-              <button className="buttons" onClick={() => setSelectedView("manual")}>🕹️</button>
-              <div className="btn-desc">Manual Intersection Control</div>
+              <button className="buttons" onClick={() => setSelectedView("manual")}> <img src={controlPanelImg} alt=""/> </button>
             </div>
             <div>
-              <button className="buttons" onClick={() => setSelectedView("stls")}>🚦</button>
-              <div className="btn-desc">STLS Board</div>
+              <button className="buttons" onClick={() => setSelectedView("stls")}> <img src={trafficHistoryImg} alt=""/></button>
             </div>
             <div>
-              <button className="buttons" onClick={() => setSelectedView("sads")}>🚨</button>
-              <div className="btn-desc">Accident History</div>
+              <button className="buttons" onClick={() => setSelectedView("sads")}> <img src={accidentHistoryImg} alt=""/> </button>
             </div>
           </div>
         </div>

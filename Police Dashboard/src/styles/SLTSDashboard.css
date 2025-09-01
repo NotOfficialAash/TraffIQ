@@ -3,7 +3,7 @@
   text-align: center;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #00fff1;
+  color: #82ca9d;   /* greenish accent for traffic */
   margin-bottom: 1rem;
 }
 
@@ -22,7 +22,7 @@
   overflow-y: auto;         /* enables vertical scroll */
   overflow-x: hidden;       /* prevents horizontal scroll */
   border-radius: 8px;
-  background: #393b3f;      /* keep your existing background */
+  background: #525050;      /* neutral background */
   padding: 0.5rem;
 }
 
@@ -38,7 +38,7 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s, transform 0.15s;
-  color: #ffffff;              /* keep text visible */
+  color: #393b3f;              /* readable text */
 }
 
 .list-container li:hover {
@@ -47,13 +47,11 @@
 }
 
 .list-container li.active {
-  border-color: hsl(0, 0%, 100%);
-  background: #00fff1;
-  font-weight: bold;        /* also keeps bold effect */
-  color: #393b3f;
-  font-style: italic;
+  border-color: #82ca9d;
+  background: #82ca9d;
+  font-weight: bold;
+  color: #393b3f;              /* contrast against green */
 }
-
 
 .left-column {
   display: grid;
@@ -71,14 +69,14 @@
 .map-container {
   border-radius: 8px;
   overflow: hidden;
-  background: #393b3f;
+  background: #525050;
 }
 
 .charts-container {
   display: flex;
   flex-direction: column;
   border-radius: 8px;
-  background: #393b3f;
+  background: #525050;
   padding: 0.5rem;
 }
 
@@ -90,13 +88,11 @@
 
 .tabs button {
   padding: 0.4rem 0.8rem;
+  border: 1px solid #ccc;
   border-radius: 6px;
-  background: #393b3f;
-  color: #ffffff;
-  font-weight: bold;
-  font-style: italic;
+  background: #525050;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .tabs button:hover {
@@ -104,9 +100,10 @@
 }
 
 .tabs button.active {
-  background: #00fff1;
-  color: #393b3f;
-  border-color: #ffffff;
+  background: #82ca9d;   /* green accent for traffic */
+  color: #ffffff;
+  border-color: #82ca9d;
+  font-weight: bold;
 }
 
 .chart-container {

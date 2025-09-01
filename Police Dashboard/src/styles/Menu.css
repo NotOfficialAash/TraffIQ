@@ -3,17 +3,8 @@
     text-align: center;
 }
 
-.title {
-    padding-top: 1vw;
-    font-size: 3.5vw;
-}
-
-.title-blue {
-    color: #63C8FF;
-}
-
-.title-white {
-    color: #ffffff;
+.welcome-img {
+  width: 43vw;
 }
 
 .button-container {
@@ -30,8 +21,14 @@
     border-radius: 1vw;
     border: none;
     cursor: pointer;
+    justify-content: center;
     transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     font-size: 2.5vw;
+    background-color: #393b3f;
+}
+
+.buttons img {
+  height: 15vw;
 }
 
 .buttons:hover {

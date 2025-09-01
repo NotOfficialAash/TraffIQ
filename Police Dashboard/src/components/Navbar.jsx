@@ -1,15 +1,19 @@
 import "../styles/Navbar.css";
 
+import titleImage from "../assets/TraffIQNavBarLogo.png";
+
 function Navbar({ setSelectedView }) {
   return (
     <nav className="navbar">
-      <h2 className="nav-title">🚦 Traffic Control</h2>
+      <a href="#" onClick={() => setSelectedView(null)}>
+        <img className="nav-title" src={titleImage} alt="Home" />
+      </a>
       <div className="nav-links">
-        <button onClick={() => setSelectedView(null)}>🏠 Home</button>
-        <button onClick={() => setSelectedView("manual")}>🕹️ Manual</button>
-        <button onClick={() => setSelectedView("stls")}>🚦 STLS</button>
-        <button onClick={() => setSelectedView("sads")}>🚨 Accident History</button>
-        <button onClick={() => setSelectedView("alert")}>⚠️ Alerts</button>
+        <button classname="nav-buttons" onClick={() => setSelectedView(null)}>HOME</button>
+        <button classname="nav-buttons" onClick={() => setSelectedView("manual")}>CONTROL PANEL</button>
+        <button classname="nav-buttons" onClick={() => setSelectedView("stls")}> TRAFFIC HISTORY</button>
+        <button classname="nav-buttons" onClick={() => setSelectedView("sads")}>ACCIDENT HISTORY</button>
+        {/* <button onClick={() => setSelectedView("alert")}>⚠️ Alerts</button>  */}
       </div>
     </nav>
   );

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import '../../styles/ManualControl.css';
+import '../styles/ManualControl.css';
 
 // Sample intersection data - replace with your actual data
 const intersections = [
