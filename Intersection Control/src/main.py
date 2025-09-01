@@ -21,12 +21,14 @@ import threading
 import logging as log
 from sys import exit
 
+
 import cv2
 from ultralytics import YOLO
 
 import traffic
 import accident
 import database
+import webserver
 
 
 capture_source = 0
@@ -81,8 +83,10 @@ def main():
     log.info("Initializing and Starting Threads...")
     trf_thread = threading.Thread(target=traffic.run, args=(shared_data, lock), daemon=True)
     acc_thread = threading.Thread(target=accident.run, args=(shared_data, lock), daemon=True)
+    wsk_thread = threading.Thread(target=webserver.run, args=("0.0.0.0", 8765), daemon=True)
     trf_thread.start()
     acc_thread.start()
+    wsk_thread.start()
     log.info("Threads Started")
 
     capture = cv2.VideoCapture(capture_source)
@@ -149,13 +153,15 @@ def main():
                 shared_data["accident"]["ai_confidence"] = confidence
 
                 if shared_data != prev_data:
-                    log.info(f"Vehicles: {shared_data['vehicle']} | Accident: {shared_data['accident']}")
+                    # log.info(f"Vehicles: {shared_data['vehicle']} | Accident: {shared_data['accident']}")
                     prev_data = shared_data.copy()
             
+            webserver.latest_frame = frame.copy()
+
             annotated = result.plot()
             annotated = blend_overlay(annotated, region_overlay, alpha=0.5)
-
             cv2.imshow("Live", annotated)
+
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 return
 

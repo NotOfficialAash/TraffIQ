@@ -13,7 +13,7 @@ function Navbar({ setSelectedView }) {
         <button classname="nav-buttons" onClick={() => setSelectedView("manual")}>CONTROL PANEL</button>
         <button classname="nav-buttons" onClick={() => setSelectedView("stls")}> TRAFFIC HISTORY</button>
         <button classname="nav-buttons" onClick={() => setSelectedView("sads")}>ACCIDENT HISTORY</button>
-        {/* <button onClick={() => setSelectedView("alert")}>⚠️ Alerts</button>  */}
+        <button onClick={() => setSelectedView("alert")}>⚠️ Alerts</button> 
       </div>
     </nav>
   );

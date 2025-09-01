@@ -1,7 +1,6 @@
-// App.jsx
 import { useState, useEffect } from "react";
 import { collection, query, onSnapshot } from "firebase/firestore";
-import { db } from "./firebase"; // Firestore instance (adjust path if needed)
+import { db } from "./firebase";
 
 import SplashScreen from "./SplashScreen.jsx";
 import AccidentAlert from './AccidentAlert.jsx';
@@ -32,21 +31,20 @@ function App() {
   // Firestore listener for new accident data
   useEffect(() => {
     const q = query(collection(db, "accident_data"));
-    let firstLoad = true;  // ignore existing documents on initial load
+    let firstLoad = true; // Ignore existing documents on initial load
 
-    const unsubscribe = onSnapshot(q, snapshot => {
-      snapshot.docChanges().forEach(change => {
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
           const data = { id: change.doc.id, ...change.doc.data() };
 
-          if (!firstLoad) { // only notify for new additions
+          if (!firstLoad) {
             console.log("New accident data:", data);
-            setNotification(data);
-            setSelectedView("alert"); // open AccidentAlert automatically
+            setNotification(data); // Set notification state
           }
         }
       });
-      firstLoad = false; // after first snapshot, future adds trigger notifications
+      firstLoad = false; // After first snapshot, future adds trigger notifications
     });
 
     return () => unsubscribe();
@@ -54,8 +52,8 @@ function App() {
 
   // Handle clicking notification banner
   const handleNotificationClick = () => {
-    setPrevView(selectedView);
-    setSelectedView("alert");
+    setPrevView(selectedView); // Save the current view
+    setSelectedView("alert"); // Switch to the alert view
   };
 
   // Handle decision from AccidentAlert component
@@ -68,9 +66,9 @@ function App() {
       showToast("⚠️ Accident acknowledged");
     }
 
-    setSelectedView(prevView);
+    setSelectedView(prevView); // Return to the previous view
     setPrevView(null);
-    setNotification(null);
+    setNotification(null); // Clear the notification
   };
 
   return (
@@ -93,16 +91,22 @@ function App() {
       {/* Main menu */}
       {!showSplash && !selectedView && (
         <div className="parent-body">
-          <img className="welcome-img" src={welcomeUserImg} alt=""/>
+          <img className="welcome-img" src={welcomeUserImg} alt="" />
           <div className="button-container">
             <div>
-              <button className="buttons" onClick={() => setSelectedView("manual")}> <img src={controlPanelImg} alt=""/> </button>
+              <button className="buttons" onClick={() => setSelectedView("manual")}>
+                <img src={controlPanelImg} alt="" />
+              </button>
             </div>
             <div>
-              <button className="buttons" onClick={() => setSelectedView("stls")}> <img src={trafficHistoryImg} alt=""/></button>
+              <button className="buttons" onClick={() => setSelectedView("stls")}>
+                <img src={trafficHistoryImg} alt="" />
+              </button>
             </div>
             <div>
-              <button className="buttons" onClick={() => setSelectedView("sads")}> <img src={accidentHistoryImg} alt=""/> </button>
+              <button className="buttons" onClick={() => setSelectedView("sads")}>
+                <img src={accidentHistoryImg} alt="" />
+              </button>
             </div>
           </div>
         </div>
