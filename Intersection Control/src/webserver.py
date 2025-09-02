@@ -1,7 +1,7 @@
 """
 ================================================================================
 Project: Smart Traffic and Accident Monitoring System
-File: main.py
+File: webserver.py
 Author(s): Aashrith Srinivasa.
 License: See LICENSE file in the repository for full terms.
 Description:

@@ -25,11 +25,13 @@ import database
 
 lat, lng = 12.312735, 76.583278
 tick = 0.1
+
+
 active_accident = False
 last_no_accident_time = time.time()
-gap_time = 5
+gap_time = 5  # seconds of "no accident" needed before logging a new one
 
-def run(shared_data : dict, lock):
+def run(shared_data: dict, lock):
     global active_accident, last_no_accident_time
     data = None
 
@@ -41,30 +43,26 @@ def run(shared_data : dict, lock):
 
         severity = "major" if data["accident"]["accident_count"] > 1 else "minor"
 
-        if data["accident"]["accident"] == True:
+        if data["accident"]["accident"]:
             if not active_accident:
+                # First time we see accident → log it
                 data_pack = {
-                    "time" : SERVER_TIMESTAMP,
-                    "location" : GeoPoint(lat, lng),
-                    "severity" : severity,
-                    "ai_conf" : data["accident"]["ai_confidence"],
-                    "er_informed" : False,
-                    "er_dispatched" : False,
-                    "real" : data["accident"]["ai_confidence"] > 25
-                    # , "nearest_hospital" : find_hospital()
+                    "time": SERVER_TIMESTAMP,
+                    "location": GeoPoint(lat, lng),
+                    "severity": severity,
+                    "ai_conf": data["accident"]["ai_confidence"],
+                    "er_informed": False,
+                    "er_dispatched": False,
+                    "real": data["accident"]["ai_confidence"] > 25
                 }
 
                 document_id = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%S") + f"_{lat}_{lng}"
-                database.write_data(collection="accident_data", data=data_pack, document_id=document_id)
+                database.write_data("accident_data", data_pack, document_id)
                 log.info("Auto-Logged Accident Data")
 
-                with lock:
-                    shared_data["accident"] = {"accident": False, "accident_count": 0, "ai_confidence" : 0}
-
                 active_accident = True
-
-            else:
-                if active_accident:
-                    last_no_accident_time = time.time()
-                    active_accident = False
-            
+        else:
+            # Accident not detected → reset after some time
+            if active_accident:
+                last_no_accident_time = time.time()
+                active_accident = False
