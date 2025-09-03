@@ -63,29 +63,29 @@ def write_data(collection : str, document_id : str, data : dict):
     try:
         doc_ref = database.collection(collection).document(document_id)
         doc_ref.set(data)
-        log.info(f"Wrote data to {collection}\{doc_ref.id}")
+        log.info(f"Wrote data to {collection}/{doc_ref.id}")
     
     except google.api_core.exceptions.GoogleAPIError as e:
         log.error(f"Firestore API error during write: {e}")
 
     except Exception as e:
-        log.error(f"Failed to write to {collection}\{document_id}: {e}")
+        log.error(f"Failed to write to {collection}/{document_id}: {e}")
 
 
 def update_data(collection: str, document_id : str, data : dict):
     try:
         doc_ref = database.collection(collection).document(document_id)
         doc_ref.update(data)
-        log.info(f"Updated {collection}\{document_id} with {data}")
+        log.info(f"Updated {collection}/{document_id} with {data}")
 
     except google.api_core.exceptions.NotFound:
-        log.error(f"Document {collection}\{document_id} not found.")
+        log.error(f"Document {collection}/{document_id} not found.")
 
     except google.api_core.exceptions.GoogleAPIError as e:
         log.error(f"Firestore API error during update: {e}")
         
     except Exception as e:
-        log.error(f"Failed to update {collection}\{document_id}: {e}")
+        log.error(f"Failed to update {collection}/{document_id}: {e}")
 
 
 def get_intersection_data():
