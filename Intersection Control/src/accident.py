@@ -11,6 +11,7 @@ Description:
 ================================================================================
 """
 
+
 # TODO: Implement algorithm to find nearest hospital
 # TODO: Log nearest hospital along with accident info
 
@@ -26,14 +27,15 @@ import database
 lat, lng = 12.312735, 76.583278
 tick = 0.1
 
-
 active_accident = False
 last_no_accident_time = time.time()
-gap_time = 5  # seconds of "no accident" needed before logging a new one
+gap_time = 5
+
 
 def run(shared_data: dict, lock):
     global active_accident, last_no_accident_time
     data = None
+
 
     while True:
         time.sleep(tick)
@@ -45,7 +47,6 @@ def run(shared_data: dict, lock):
 
         if data["accident"]["accident"]:
             if not active_accident:
-                # First time we see accident → log it
                 data_pack = {
                     "time": SERVER_TIMESTAMP,
                     "location": GeoPoint(lat, lng),
@@ -61,8 +62,8 @@ def run(shared_data: dict, lock):
                 log.info("Auto-Logged Accident Data")
 
                 active_accident = True
+                
         else:
-            # Accident not detected → reset after some time
             if active_accident:
                 last_no_accident_time = time.time()
                 active_accident = False

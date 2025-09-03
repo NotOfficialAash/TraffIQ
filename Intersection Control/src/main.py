@@ -15,14 +15,13 @@ Description:
 """
 
 
-import json
-import numpy
+
 import threading
 import logging as log
 from sys import exit
 
-
 import cv2
+import numpy
 from ultralytics import YOLO
 
 import traffic
@@ -41,7 +40,7 @@ model_half = False
 
 log.basicConfig(
     level=log.INFO,
-    format="%(asctime)s // [%(levelname)s] %(message)s"
+    format="%(asctime)s // %(levelname)s [%(filename)s] :: %(message)s"
 )
 
 
@@ -90,7 +89,7 @@ def blend_overlay(frame, overlay, alpha=0.5):
 
 
 def main():
-    log.info("Initializing and Starting Threads...")
+    log.info("Starting Threads...")
     trf_thread = threading.Thread(target=traffic.run, args=(shared_data, lock), daemon=True)
     acc_thread = threading.Thread(target=accident.run, args=(shared_data, lock), daemon=True)
     wsk_thread = threading.Thread(target=webserver.run, args=("0.0.0.0", 8765), daemon=True)
@@ -103,16 +102,14 @@ def main():
     capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
-
     log.info("Capture Source Open")
-    names = model.names
 
+    names = model.names
     dummy_frame = numpy.zeros((frame_height, frame_width, 3), dtype=numpy.uint8)
     region_overlay = create_region_overlay(dummy_frame.shape, regions)
 
 
     try:
-        frame_id = 0
         prev_data = None
 
         while capture.isOpened():
@@ -182,7 +179,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        log.info("Systems  Starting...")
+        log.info("Starting Systems and Initializing...")
 
         capture_init()
         traffic.init()

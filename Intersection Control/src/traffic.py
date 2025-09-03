@@ -15,7 +15,6 @@ import time
 import datetime
 import logging as log
 from sys import exit
-from json import load
 
 import serial
 from firebase_admin.firestore import GeoPoint, SERVER_TIMESTAMP
@@ -28,7 +27,6 @@ arduino = None
 log_interval = 1800
 lat, lng = 12.312735, 76.583278
 
-
 PHASE_FLOW = {
     "green": "yellow_stop",
     "yellow_stop": "yellow_start",
@@ -40,6 +38,7 @@ def init():
     global arduino
     try:
         arduino = serial.Serial(port="COM6", baudrate=9600, timeout=1)
+
     except serial.SerialException as e:
         log.critical(f"Arduino connection failed: {e}")
         exit(2)
@@ -49,6 +48,7 @@ def send_signal(cmd: str):
     try:
         arduino.write((cmd + "\n").encode())
         time.sleep(0.05)
+
     except serial.SerialException as e:
         log.error(f"Arduino write failed: {e}")
 
@@ -57,6 +57,7 @@ def set_signal_state(signal: str, red: bool, yellow: bool, green: bool):
     send_signal(f"{signal}_R_{'ON' if red else 'OFF'}")
     send_signal(f"{signal}_Y_{'ON' if yellow else 'OFF'}")
     send_signal(f"{signal}_G_{'ON' if green else 'OFF'}")
+
     log.info(f"{signal} → {'R' if red else ''}{'Y' if yellow else ''}{'G' if green else ''}")
 
 
@@ -76,10 +77,7 @@ def get_durations(vehicle_counts):
 def run(shared_data : dict, lock):
     regions = database.get_intersection_data()
     region_names = list(regions.keys())
-    signal_order = {
-        region_names[i]: region_names[(i + 1) % len(region_names)]
-        for i in range(len(region_names))
-    }
+    signal_order = {region_names[i]: region_names[(i + 1) % len(region_names)] for i in range(len(region_names))}
 
     current_green = region_names[0]
     next_green = signal_order[current_green]
@@ -95,6 +93,7 @@ def run(shared_data : dict, lock):
         "yellow_stop": durations["yellow_stop"],
         "yellow_start": durations["yellow_start"]
     }
+
 
     while True:
         time.sleep(tick)
@@ -134,7 +133,7 @@ def run(shared_data : dict, lock):
                 "time": SERVER_TIMESTAMP,
                 "location" : GeoPoint(lat, lng),
                 "density" : data["total"]
-                }
+            }
 
             document_id = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%S")
             database.write_data(collection="traffic_data", data=data_pack, document_id=document_id)

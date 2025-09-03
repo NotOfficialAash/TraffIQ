@@ -12,12 +12,13 @@ Description:
 """
 
 
-import cv2
 import json
 import base64
 import asyncio
-import websockets
 import logging as log
+
+import cv2
+import websockets
 
 
 streaming_enabled = False
@@ -39,7 +40,6 @@ async def vhandler(websocket):
                 log.info("Streaming Started to Client")
 
                 await websocket.send(json.dumps({"status" : "streaming started"}))
-
 
                 while streaming_enabled and websocket.state == websockets.protocol.State.OPEN:
                     if latest_frame is not None:
