@@ -2,6 +2,7 @@
 Intersection Control/firebase-key.json
 Intersection Control/src/__pycache__
 
+
 # Police Dashboard rules
 Police Dashboard/logs/
 Police Dashboard/*.log
@@ -27,5 +28,10 @@ Police Dashboard/*.sln
 Police Dashboard/*.sw?
 Police Dashboard/src/components/firebase.js
 
+
 # Hospital Dashboard Rules
 Hospital Dashboard/firebase-key.json
+
+
+# General Rules
+Todo.txt
