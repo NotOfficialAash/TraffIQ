@@ -57,7 +57,7 @@ def run(shared_data: dict, lock):
                 }
 
                 document_id = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%S") + f"_{lat}_{lng}"
-                database.write_data("accident_data", data_pack, document_id)
+                database.write_data("accident_data", document_id, data_pack)
                 log.info("Auto-Logged Accident Data")
 
                 active_accident = True
