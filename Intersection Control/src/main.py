@@ -55,23 +55,33 @@ def capture_init():
 
 
 def get_region(cx, cy):
-    for name, (rx1, ry1, rx2, ry2) in regions.items():
-        if rx1 <= cx <= rx2 and ry1 <= cy <= ry2:
+    point = (float(cx), float(cy))   # force tuple of floats
+    for name, points in regions.items():
+        contour = numpy.array(points, dtype=numpy.int32)
+        if cv2.pointPolygonTest(contour, point, False) >= 0:
             return name
     return None
 
 
 def create_region_overlay(frame_shape, regions):
-    overlay = numpy.zeros((*frame_shape[:2], 3), dtype=numpy.uint8)  # fully transparent
+    overlay = numpy.zeros((*frame_shape[:2], 3), dtype=numpy.uint8)
 
-    for name, (rx1, ry1, rx2, ry2) in regions.items():
-        # Draw rectangle
-        cv2.rectangle(overlay, (rx1, ry1), (rx2, ry2), (0, 255, 0), 2)
-        # Draw label
+    for name, points in regions.items():
+        pts = numpy.array(points, numpy.int32).reshape((-1, 1, 2))
+
+        # Transparent fill (light green)
+        cv2.fillPoly(overlay, [pts], (0, 255, 0))
+
+        # Outline
+        cv2.polylines(overlay, [pts], isClosed=True, color=(0, 0, 0), thickness=2)
+
+        # Label
+        x, y = points[0]
         cv2.putText(
-            overlay, name, (rx1, ry1 - 5),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2
+            overlay, name, (x, y - 5),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2
         )
+
     return overlay
 
 
@@ -89,7 +99,8 @@ def main():
     wsk_thread.start()
     log.info("Threads Started")
 
-    capture = cv2.VideoCapture(capture_source)
+    capture = cv2.VideoCapture(capture_source, cv2.CAP_DSHOW)
+    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
 
@@ -109,11 +120,6 @@ def main():
             if not success:
                 log.error("Failed to read frame")
                 break
-
-            frame_id += 1
-            skip_frames = 2
-            if frame_id % skip_frames != 0:
-                continue
 
             try:
                 results = model.predict(frame, verbose=False, device=model_device, half=model_half)

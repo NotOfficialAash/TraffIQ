@@ -89,19 +89,10 @@ def update_data(collection: str, document_id : str, data : dict):
 
 
 def get_intersection_data():
-    try:
-        doc_ref = database.collection("intersection_data").document("test_doc")
-        doc_data = doc_ref.get().to_dict()
+    regions = {
+        "A": [(0, 205), (0, 375), (250, 375), (250, 205)],
+        "B": [(350, 230), (350, 420), (630, 420), (630, 230)],
+        "C": [(70, 100), (70, 190), (280, 190), (280, 100)]
+    }
 
-        region_data = doc_data.get("regions", {})
-
-        return region_data
-
-    except google.api_core.exceptions.NotFound:
-        log.error(f"Document intersection_data/test_doc not found.")
-
-    except google.api_core.exceptions.GoogleAPIError as e:
-        log.error(f"Firestore API error during update: {e}")
-        
-    except Exception as e:
-        log.error(f"Failed to update intersection_data/test_doc: {e}")
+    return regions
