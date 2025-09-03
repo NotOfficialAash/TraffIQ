@@ -1,0 +1,118 @@
+/* Centered title outside main grid */
+.dashboard h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #82ca9d;   /* greenish accent for traffic */
+  margin-bottom: 1rem;
+}
+
+/* Main grid layout: 2 columns */
+.content-container {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  gap: 1rem;
+  height: calc(100vh - 20vh); /* leave room for title */
+  padding: 0 1rem 1rem;
+}
+
+/* Left: List */
+.list-container {
+  height: 39vh;             /* keeps it scrollable within fixed space */
+  overflow-y: auto;         /* enables vertical scroll */
+  overflow-x: hidden;       /* prevents horizontal scroll */
+  border-radius: 8px;
+  background: #525050;      /* neutral background */
+  padding: 0.5rem;
+}
+
+.list-container ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list-container li {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  color: #393b3f;              /* readable text */
+}
+
+.list-container li:hover {
+  background: #696969;
+  transform: translateX(2px);
+}
+
+.list-container li.active {
+  border-color: #82ca9d;
+  background: #82ca9d;
+  font-weight: bold;
+  color: #393b3f;              /* contrast against green */
+}
+
+.left-column {
+  display: grid;
+  grid-template-rows: 50% 50%;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.right-column {
+  display: grid;
+  gap: 1rem;
+  height: 100%;
+}
+
+.map-container {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #525050;
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  background: #525050;
+  padding: 0.5rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tabs button {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #525050;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tabs button:hover {
+  background: #696969;
+}
+
+.tabs button.active {
+  background: #82ca9d;   /* green accent for traffic */
+  color: #ffffff;
+  border-color: #82ca9d;
+  font-weight: bold;
+}
+
+.chart-container {
+  flex: 1;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 0.5rem;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -2,19 +2,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #1a1a1a;
+  background: #393b3f;
   padding: 0.3rem 0.8rem;
   color: white;
   position: sticky;
   top: 0;
   z-index: 1000;
   height: 45px;
+  border-radius: 1vw;
 }
 
 .nav-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0;
+  width: 4vw;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
 }
 
 .nav-links button {
@@ -22,10 +28,12 @@
   padding: 0.2rem 0.6rem;
   border: none;
   border-radius: 4px;
-  background: #333;
-  color: white;
+  background: #00fff1;
+  color: #393b3f;
   cursor: pointer;
   font-size: 0.9rem;
+  font-weight: bold;
+  font-style: italic;
 }
 
 .nav-links button:hover {
